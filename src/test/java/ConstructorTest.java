@@ -1,87 +1,70 @@
-import createAndDeleteWebDriver.CreateWebDriver;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import pageObject.ConstructorPage;
-import pageObject.HomePage;
+import pageobject.ConstructorPage;
+import pageobject.HomePage;
 import user.CreateRandomUserData;
 import user.User;
 import user.UserApiMethods;
+import user.UserEmailAndNameModel;
+import webelementcomparison.WebElementComparsion;
 
 
 public class ConstructorTest {
-    WebDriver driver = CreateWebDriver.createWebDriver();
+    DriverFactory driverFactory = new DriverFactory();
     User user;
 
-    @Before
-    public void createRandomUser(){
-        user = CreateRandomUserData.createRandomUserData();
-        UserApiMethods userApiMethods = new UserApiMethods(user);
-        userApiMethods.sendRequestCreate();
+    public ConstructorTest() throws InterruptedException {
     }
+
+
 
     @Test
     public void goToBunsSelection() {
-        driver.manage().window().maximize();
-        driver.get("https://stellarburgers.nomoreparties.site/login");
-        HomePage homePage = new HomePage(driver);
+        driverFactory.getDriver().manage().window().maximize();
+        driverFactory.getDriver().get("https://stellarburgers.nomoreparties.site/login");
+        HomePage homePage = new HomePage(driverFactory.getDriver());
         homePage.waitingForVisibilityConstructorButton()
                 .clickConstructorButton();
-        ConstructorPage constructorPage = new ConstructorPage(driver);
+        ConstructorPage constructorPage = new ConstructorPage(driverFactory.getDriver());
         constructorPage.waitingForVisibilitySauceSelection()
                 .clickSauceSelection()
                 .clickBunSelection();
-        WebElement bunSectionHeader = driver.findElement(By.xpath(constructorPage.getBunSectionHeader()));
-        WebElement currentSectionHeaderExpected = bunSectionHeader.findElement(By.xpath(constructorPage.getParentElement()));
-        WebElement currentSectionHeaderActual = driver.findElement(By.xpath(constructorPage.getCurrentSectionHeader()));
-        Assert.assertEquals(currentSectionHeaderExpected,currentSectionHeaderActual);
+        WebElementComparsion webElementComparsion = new WebElementComparsion(constructorPage, driverFactory.driver);
+        Assert.assertTrue(webElementComparsion.isBunSelectionSuccess());
     }
 
     @Test
     public void goToSauceSelection() {
-        driver.manage().window().maximize();
-        driver.get("https://stellarburgers.nomoreparties.site/login");
-        HomePage homePage = new HomePage(driver);
+        driverFactory.getDriver().manage().window().maximize();
+        driverFactory.getDriver().get("https://stellarburgers.nomoreparties.site/login");
+        HomePage homePage = new HomePage(driverFactory.getDriver());
         homePage.waitingForVisibilityConstructorButton()
                 .clickConstructorButton();
-        ConstructorPage constructorPage = new ConstructorPage(driver);
+        ConstructorPage constructorPage = new ConstructorPage(driverFactory.getDriver());
         constructorPage.waitingForVisibilitySauceSelection()
                 .clickSauceSelection();
-        WebElement SauceSelectionHeader = driver.findElement(By.xpath(constructorPage.getSauceSelectionHeader()));
-        WebElement currentSectionHeaderExpected = SauceSelectionHeader.findElement(By.xpath(constructorPage.getParentElement()));
-        WebElement currentSectionHeaderActual = driver.findElement(By.xpath(constructorPage.getCurrentSectionHeader()));
-        Assert.assertEquals(currentSectionHeaderExpected,currentSectionHeaderActual);
-
+        WebElementComparsion webElementComparsion = new WebElementComparsion(constructorPage, driverFactory.driver);
+        Assert.assertTrue(webElementComparsion.isSauceSelectionSuccess());
     }
 
     @Test
     public void goToFillingsSelection() throws InterruptedException {
-        driver.manage().window().maximize();
-        driver.get("https://stellarburgers.nomoreparties.site/login");
-        HomePage homePage = new HomePage(driver);
+        driverFactory.getDriver().manage().window().maximize();
+        driverFactory.getDriver().get("https://stellarburgers.nomoreparties.site/login");
+        HomePage homePage = new HomePage(driverFactory.getDriver());
         homePage.waitingForVisibilityConstructorButton()
                 .clickConstructorButton();
-        ConstructorPage constructorPage = new ConstructorPage(driver);
+        ConstructorPage constructorPage = new ConstructorPage(driverFactory.getDriver());
         constructorPage.waitingForVisibilitySauceSelection()
                 .clickFillingsSelection();
-        WebElement FillingSelectionHeader = driver.findElement(By.xpath(constructorPage.getFillingsSelectionHeader()));
-        WebElement currentSectionHeaderExpected = FillingSelectionHeader.findElement(By.xpath(constructorPage.getParentElement()));
-        WebElement currentSectionHeaderActual = driver.findElement(By.xpath(constructorPage.getCurrentSectionHeader()));
-        Assert.assertEquals(currentSectionHeaderExpected,currentSectionHeaderActual);
-
+        WebElementComparsion webElementComparsion = new WebElementComparsion(constructorPage, driverFactory.driver);
+        Assert.assertTrue(webElementComparsion.isFillingSelectionSuccess());
     }
 
     @After
     public void teardown() {
-        driver.quit();
-        UserApiMethods userApiMethods = new UserApiMethods(user);
-        if (userApiMethods.isUserExist(user)) {
-            userApiMethods.sendRequestLogin(user);
-            userApiMethods.sendRequestDelete(user);
-        }
+        driverFactory.getDriver().quit();
     }
 }

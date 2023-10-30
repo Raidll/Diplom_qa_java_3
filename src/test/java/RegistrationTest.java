@@ -1,39 +1,40 @@
-import createAndDeleteWebDriver.CreateWebDriver;
 import org.junit.After;
 import org.junit.Test;
-import org.openqa.selenium.WebDriver;
-import pageObject.HomePage;
-import pageObject.LoginPage;
-import pageObject.RegistrationPage;
+import pageobject.HomePage;
+import pageobject.LoginPage;
+import pageobject.RegistrationPage;
 import user.CreateRandomUserData;
 import user.User;
 import user.UserApiMethods;
-import baseURL.BaseUrl;
+import baseurl.BaseUrl;
+import user.UserEmailAndNameModel;
 
 public class RegistrationTest {
-    WebDriver driver = CreateWebDriver.createWebDriver();
+    DriverFactory driverFactory = new DriverFactory();
     User user;
+
+    public RegistrationTest() throws InterruptedException {
+    }
 
     @Test
     public void registrationNewUserSuccess() throws InterruptedException {
         user = CreateRandomUserData.createRandomUserData();
 
-        driver.manage().window().maximize();
-        driver.get(BaseUrl.getBaseURL());
-        HomePage homePage = new HomePage(driver);
+        driverFactory.getDriver().manage().window().maximize();
+        driverFactory.getDriver().get(BaseUrl.getBaseURL());
+        HomePage homePage = new HomePage(driverFactory.getDriver());
         homePage.clickButtonPersonalAccount();
 
-        LoginPage loginPage = new LoginPage(driver);
+        LoginPage loginPage = new LoginPage(driverFactory.getDriver());
         loginPage.waitingForVisibilityEmailInput()
                         .clickRegistrationButton();
-        RegistrationPage registrationPage = new RegistrationPage(driver);
+        RegistrationPage registrationPage = new RegistrationPage(driverFactory.getDriver());
         registrationPage.waitingForVisibilityNameInput()
                 .clickInputName()
                 .fillName(user.getName())
                 .fillEmail(user.getEmail())
                 .fillPassword(user.getPassword())
                 .clickToRegistrationButton();
-        Thread.sleep(2000);
        loginPage.waitingForVisibilityEmailInput()
                 .fillEmail(user.getEmail())
                 .fillPassword(user.getPassword());
@@ -45,15 +46,15 @@ public class RegistrationTest {
     public void createNewUserWithPasswordLessThanSixCharacters(){
         user = new User("Test@mail.ru", "abcde", "TestName");
 
-        driver.manage().window().maximize();
-        driver.get(BaseUrl.getBaseURL());
-        HomePage homePage = new HomePage(driver);
+        driverFactory.getDriver().manage().window().maximize();
+        driverFactory.getDriver().get(BaseUrl.getBaseURL());
+        HomePage homePage = new HomePage(driverFactory.getDriver());
         homePage.clickButtonPersonalAccount();
 
-        LoginPage loginPage = new LoginPage(driver);
+        LoginPage loginPage = new LoginPage(driverFactory.getDriver());
         loginPage.waitingForVisibilityEmailInput()
                 .clickRegistrationButton();
-        RegistrationPage registrationPage = new RegistrationPage(driver);
+        RegistrationPage registrationPage = new RegistrationPage(driverFactory.getDriver());
         registrationPage.waitingForVisibilityNameInput()
                 .clickInputName()
                 .fillName(user.getName())
@@ -65,10 +66,10 @@ public class RegistrationTest {
 
     @After
     public void teardown() {
-        driver.quit();
+        driverFactory.getDriver().quit();
         UserApiMethods userApiMethods = new UserApiMethods(user);
-        if (userApiMethods.isUserExist(user)) {
-            userApiMethods.sendRequestLogin(user);
+        if (userApiMethods.isUserExist(new UserEmailAndNameModel(user.getEmail(), user.getName()))) {
+            userApiMethods.sendRequestLogin(new UserEmailAndNameModel(user.getEmail(), user.getName()));
             userApiMethods.sendRequestDelete(user);
         }
     }

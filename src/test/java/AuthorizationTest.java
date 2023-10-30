@@ -1,20 +1,22 @@
-import baseURL.BaseUrl;
-import createAndDeleteWebDriver.CreateWebDriver;
+import baseurl.BaseUrl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.WebDriver;
-import pageObject.ForgotPasswordPage;
-import pageObject.HomePage;
-import pageObject.LoginPage;
-import pageObject.RegistrationPage;
+import pageobject.ForgotPasswordPage;
+import pageobject.HomePage;
+import pageobject.LoginPage;
+import pageobject.RegistrationPage;
 import user.CreateRandomUserData;
 import user.User;
 import user.UserApiMethods;
+import user.UserEmailAndNameModel;
 
 public class AuthorizationTest {
-    WebDriver driver = CreateWebDriver.createWebDriver();
+    DriverFactory driverFactory = new DriverFactory();
     User user;
+
+    public AuthorizationTest() throws InterruptedException {
+    }
 
     @Before
     public void createRandomUser(){
@@ -25,12 +27,12 @@ public class AuthorizationTest {
 
     @Test
     public void authorizationWithLoginButtonOnHomePage(){
-        driver.manage().window().maximize();
-        driver.get(BaseUrl.getBaseURL());
-        HomePage homePage = new HomePage(driver);
+        driverFactory.getDriver().manage().window().maximize();
+        driverFactory.getDriver().get(BaseUrl.getBaseURL());
+        HomePage homePage = new HomePage(driverFactory.getDriver());
         homePage.waitingForVisibilityLoginButton()
                 .clickLoginButton();
-        LoginPage loginPage = new LoginPage(driver);
+        LoginPage loginPage = new LoginPage(driverFactory.getDriver());
         loginPage.fillEmail(user.getEmail())
                 .fillPassword(user.getPassword())
                 .clickLoginButton();
@@ -39,43 +41,43 @@ public class AuthorizationTest {
 
     @Test
     public void authorizationWithLoginButtonAfterClickOnPersonalAreaButton(){
-        driver.manage().window().maximize();
-        driver.get("https://stellarburgers.nomoreparties.site/login");
-        LoginPage loginPage = new LoginPage(driver);
+        driverFactory.getDriver().manage().window().maximize();
+        driverFactory.getDriver().get("https://stellarburgers.nomoreparties.site/login");
+        LoginPage loginPage = new LoginPage(driverFactory.getDriver());
         loginPage.fillEmail(user.getEmail())
                 .fillPassword(user.getPassword())
                 .clickLoginButton();
-        HomePage homePage = new HomePage(driver);
+        HomePage homePage = new HomePage(driverFactory.getDriver());
         homePage.waitingForVisibilityCreateOrderButton();
     }
 
     @Test
     public void authorizationWithLoginButtonInRegistrationForm(){
-        driver.manage().window().maximize();
-        driver.get("https://stellarburgers.nomoreparties.site/register");
-        RegistrationPage registrationPage = new RegistrationPage(driver);
+        driverFactory.getDriver().manage().window().maximize();
+        driverFactory.getDriver().get("https://stellarburgers.nomoreparties.site/register");
+        RegistrationPage registrationPage = new RegistrationPage(driverFactory.getDriver());
         registrationPage.waitingForVisibilityLoginButton()
                 .clickLoginButton();
-        LoginPage loginPage = new LoginPage(driver);
+        LoginPage loginPage = new LoginPage(driverFactory.getDriver());
         loginPage.fillEmail(user.getEmail())
                 .fillPassword(user.getPassword())
                 .clickLoginButton();
-        HomePage homePage = new HomePage(driver);
+        HomePage homePage = new HomePage(driverFactory.getDriver());
         homePage.waitingForVisibilityCreateOrderButton();
     }
 
     @Test
     public void authorizationWithLoginButtonInForgotPasswordPage(){
-        driver.manage().window().maximize();
-        driver.get("https://stellarburgers.nomoreparties.site/forgot-password");
-        ForgotPasswordPage forgotPasswordPage = new ForgotPasswordPage(driver);
+        driverFactory.getDriver().manage().window().maximize();
+        driverFactory.getDriver().get("https://stellarburgers.nomoreparties.site/forgot-password");
+        ForgotPasswordPage forgotPasswordPage = new ForgotPasswordPage(driverFactory.getDriver());
         forgotPasswordPage.waitingForVisibilityLoginButton()
                 .clickLoginButton();
-        LoginPage loginPage = new LoginPage(driver);
+        LoginPage loginPage = new LoginPage(driverFactory.getDriver());
         loginPage.fillEmail(user.getEmail())
                 .fillPassword(user.getPassword())
                 .clickLoginButton();
-        HomePage homePage = new HomePage(driver);
+        HomePage homePage = new HomePage(driverFactory.getDriver());
         homePage.waitingForVisibilityCreateOrderButton();
     }
 
@@ -83,10 +85,10 @@ public class AuthorizationTest {
 
     @After
     public void teardown() {
-        driver.quit();
+        driverFactory.getDriver().quit();
         UserApiMethods userApiMethods = new UserApiMethods(user);
-        if (userApiMethods.isUserExist(user)) {
-            userApiMethods.sendRequestLogin(user);
+        if (userApiMethods.isUserExist(new UserEmailAndNameModel(user.getEmail(), user.getName()))) {
+            userApiMethods.sendRequestLogin(new UserEmailAndNameModel(user.getEmail(), user.getName()));
             userApiMethods.sendRequestDelete(user);
         }
     }

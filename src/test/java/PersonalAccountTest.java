@@ -1,20 +1,21 @@
-import baseURL.BaseUrl;
-import createAndDeleteWebDriver.CreateWebDriver;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.WebDriver;
-import pageObject.ConstructorPage;
-import pageObject.HomePage;
-import pageObject.LoginPage;
-import pageObject.ProfilePage;
+import pageobject.ConstructorPage;
+import pageobject.HomePage;
+import pageobject.LoginPage;
+import pageobject.ProfilePage;
 import user.CreateRandomUserData;
 import user.User;
 import user.UserApiMethods;
+import user.UserEmailAndNameModel;
 
 public class PersonalAccountTest {
-    WebDriver driver = CreateWebDriver.createWebDriver();
+    DriverFactory driverFactory = new DriverFactory();
     User user;
+
+    public PersonalAccountTest() throws InterruptedException {
+    }
 
     @Before
     public void createRandomUser(){
@@ -25,67 +26,67 @@ public class PersonalAccountTest {
 
     @Test
     public void goToPersonalAccount(){
-        driver.manage().window().maximize();
-        driver.get("https://stellarburgers.nomoreparties.site/login");
-        LoginPage loginPage = new LoginPage(driver);
+        driverFactory.getDriver().manage().window().maximize();
+        driverFactory.getDriver().get("https://stellarburgers.nomoreparties.site/login");
+        LoginPage loginPage = new LoginPage(driverFactory.getDriver());
         loginPage.fillEmail(user.getEmail())
                 .fillPassword(user.getPassword())
                 .clickLoginButton();
-        HomePage homePage = new HomePage(driver);
+        HomePage homePage = new HomePage(driverFactory.getDriver());
         homePage.waitingForVisibilityPersonalAccountButton()
                 .clickButtonPersonalAccount();
-        ProfilePage profilePage = new ProfilePage(driver);
+        ProfilePage profilePage = new ProfilePage(driverFactory.getDriver());
         profilePage.waitingForVisibilitySaveButton();
     }
 
     @Test
     public void goToConstructorTest() {
-        driver.manage().window().maximize();
-        driver.get("https://stellarburgers.nomoreparties.site/login");
-        LoginPage loginPage = new LoginPage(driver);
+        driverFactory.getDriver().manage().window().maximize();
+        driverFactory.getDriver().get("https://stellarburgers.nomoreparties.site/login");
+        LoginPage loginPage = new LoginPage(driverFactory.getDriver());
         loginPage.fillEmail(user.getEmail())
                 .fillPassword(user.getPassword())
                 .clickLoginButton();
-        HomePage homePage = new HomePage(driver);
+        HomePage homePage = new HomePage(driverFactory.getDriver());
         homePage.waitingForVisibilityPersonalAccountButton()
                 .clickButtonPersonalAccount();
-        ProfilePage profilePage = new ProfilePage(driver);
+        ProfilePage profilePage = new ProfilePage(driverFactory.getDriver());
         profilePage.waitingForVisibilityConstructorButton()
                 .clickConstructorButton();
-        ConstructorPage constructorPage = new ConstructorPage(driver);
+        ConstructorPage constructorPage = new ConstructorPage(driverFactory.getDriver());
         constructorPage.waitingForVisibilityCreateOrderButton();
     }
 
     @Test
     public void goToConstructorClickOnLogo() {
-        driver.manage().window().maximize();
-        driver.get("https://stellarburgers.nomoreparties.site/login");
-        LoginPage loginPage = new LoginPage(driver);
+        driverFactory.getDriver().manage().window().maximize();
+        driverFactory.getDriver().get("https://stellarburgers.nomoreparties.site/login");
+        LoginPage loginPage = new LoginPage(driverFactory.getDriver());
         loginPage.fillEmail(user.getEmail())
                 .fillPassword(user.getPassword())
                 .clickLoginButton();
-        HomePage homePage = new HomePage(driver);
+        HomePage homePage = new HomePage(driverFactory.getDriver());
         homePage.waitingForVisibilityPersonalAccountButton()
                 .clickButtonPersonalAccount();
-        ProfilePage profilePage = new ProfilePage(driver);
+        ProfilePage profilePage = new ProfilePage(driverFactory.getDriver());
         profilePage.waitingForVisibilityLogoButton()
                 .clickLogoButton();
-        ConstructorPage constructorPage = new ConstructorPage(driver);
+        ConstructorPage constructorPage = new ConstructorPage(driverFactory.getDriver());
         constructorPage.waitingForVisibilityCreateOrderButton();
     }
 
     @Test
-    public void LogoutButtonTest() {
-        driver.manage().window().maximize();
-        driver.get("https://stellarburgers.nomoreparties.site/login");
-        LoginPage loginPage = new LoginPage(driver);
+    public void logoutButtonTest() {
+        driverFactory.getDriver().manage().window().maximize();
+        driverFactory.getDriver().get("https://stellarburgers.nomoreparties.site/login");
+        LoginPage loginPage = new LoginPage(driverFactory.getDriver());
         loginPage.fillEmail(user.getEmail())
                 .fillPassword(user.getPassword())
                 .clickLoginButton();
-        HomePage homePage = new HomePage(driver);
+        HomePage homePage = new HomePage(driverFactory.getDriver());
         homePage.waitingForVisibilityPersonalAccountButton()
                 .clickButtonPersonalAccount();
-        ProfilePage profilePage = new ProfilePage(driver);
+        ProfilePage profilePage = new ProfilePage(driverFactory.getDriver());
         profilePage.waitingForVisibilityLogoutButton()
                 .clickLogoutButton();
         homePage.waitingForVisibilityPersonalAccountButton()
@@ -95,10 +96,10 @@ public class PersonalAccountTest {
 
     @After
     public void teardown() {
-        driver.quit();
+        driverFactory.getDriver().quit();
         UserApiMethods userApiMethods = new UserApiMethods(user);
-        if (userApiMethods.isUserExist(user)) {
-            userApiMethods.sendRequestLogin(user);
+        if (userApiMethods.isUserExist(new UserEmailAndNameModel(user.getEmail(), user.getName()))) {
+            userApiMethods.sendRequestLogin(new UserEmailAndNameModel(user.getEmail(), user.getName()));
             userApiMethods.sendRequestDelete(user);
         }
     }

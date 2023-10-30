@@ -3,9 +3,8 @@ package user;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 
-import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.given;
-import baseURL.BaseUrl;
+import baseurl.BaseUrl;
 
 public class UserApiMethods {
     private User user;
@@ -37,16 +36,12 @@ public class UserApiMethods {
                 .delete(DELETE_USER);
     }
 
-    public Response sendRequestLogin(User user){
+    public Response sendRequestLogin(UserEmailAndNameModel userEmailAndNameModel){
         RestAssured.baseURI = BaseUrl.getBaseURL();
-        String loginAndPasswordJson = "{\n" +
-                "\"email\": " + "\""+ user.getEmail() + "\"" +",\n" +
-                "\"password\": " + "\"" + user.getPassword() + "\"\n" +
-                "}";
 
         Response  response = given()
                 .header("Content-type", "application/json")
-                .body(loginAndPasswordJson)
+                .body(userEmailAndNameModel)
                 .when()
                 .post(LOGIN_USER);
         String fullAccessToken = response.path("accessToken");
@@ -54,16 +49,11 @@ public class UserApiMethods {
         return response;
     }
 
-    public boolean isUserExist(User user){
+    public boolean isUserExist(UserEmailAndNameModel userEmailAndNameModel){
         RestAssured.baseURI = BaseUrl.getBaseURL();
-        String loginAndPasswordJson = "{\n" +
-                "\"email\": " + "\""+ user.getEmail() + "\"" +",\n" +
-                "\"password\": " + "\"" + user.getPassword() + "\"\n" +
-                "}";
-
         Response  response = given()
                 .header("Content-type", "application/json")
-                .body(loginAndPasswordJson)
+                .body(userEmailAndNameModel)
                 .when()
                 .post(LOGIN_USER);
 
